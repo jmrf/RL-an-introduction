@@ -3,6 +3,7 @@ from common.problems.k_armed_bandit import kArmedBandit
 import pytest
 import numpy as np
 
+
 @pytest.mark.parametrize('k', [10])
 def test_k_arm_bandit_stationary(k):
     # init the k armed bandit
@@ -15,7 +16,7 @@ def test_k_arm_bandit_stationary(k):
         bandit.execute_action(action_idx)
         for _ in range(int(1e6))
     ]
-    assert np.isclose(r, np.mean(rewards), rtol=1.e-2)
+    assert np.isclose(r, np.mean(rewards), rtol=5e-2)
 
 
 @pytest.mark.parametrize('k', [10])
