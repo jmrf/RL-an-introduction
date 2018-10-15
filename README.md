@@ -1,6 +1,6 @@
 # Reinforcement Learning: An Introduction (programming exercises)
 
-[![Build Status](https://travis-ci.org/jmrf/RL-an-introduction.svg.png?branch={{branch}})](https://travis-ci.org/jmrf/RL-an-introduction)
+[![Build Status](https://travis-ci.org/jmrf/RL-an-introduction.png?branch=master)](https://travis-ci.org/jmrf/RL-an-introduction)
 
 
 This repo contains solutions for the programming exercises from Sutton & Barto's
