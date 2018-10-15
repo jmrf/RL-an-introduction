@@ -5,37 +5,11 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 
 from common import logger
-from common import incremental_average
+from common.algos import action_value_sampling
 from common.problems.k_armed_bandit import kArmedBandit
 
 
-def action_value_alg(bandit, k, steps, epsilon):
-
-    # action values and rewards over time
-    action_values = np.zeros(k)
-    num_selections = np.ones(k)
-    rewards = np.zeros(steps)
-    is_optimal = np.zeros(steps)
-
-    for s in range(steps):
-        # select an action (greedy with prob=epsilon)
-        explore = epsilon > np.random.rand()
-        action_idx = np.random.randint(k) if explore else np.argmax(action_values)
-        num_selections[action_idx] += 1
-        # execute action
-        rewards[s] = bandit.execute_action(action_idx)
-        is_optimal[s] = int(bandit.get_optimal_action() == action_idx)
-        # update the average
-        action_values[action_idx] = incremental_average(
-            rewards[s],
-            action_values[action_idx],
-            num_selections[action_idx]
-        )
-
-    return rewards, is_optimal
-
-
-def ex_2_3(runs, k, steps, epsilons, stationary):
+def ex_2_3(runs, k, steps, epsilons, initial_value=0, stationary=True, alpha=1):
 
     # init the bandit problem (stationary)
     bandit = kArmedBandit(k, stationary=stationary)
@@ -48,12 +22,13 @@ def ex_2_3(runs, k, steps, epsilons, stationary):
     epsilon_iter = tqdm(epsilons)
     for eps in epsilon_iter:
         epsilon_iter.set_description(f"Ex 2.3 - epsilon={eps:.3f}")
+        # we use realistic initial values instead of optimistic ones
         avg_rewards = np.zeros(steps)
         avg_optimals = np.zeros(steps)
         avg_explorations = 0
         # run the experiment 'runs' times
         for r in tqdm(range(runs)):
-            rewards, is_optimal = action_value_alg(bandit, k, steps, eps)
+            rewards, is_optimal = action_value_sampling(bandit, k, steps, eps, alpha, initial_value)
             # accumulate rewards across steps
             avg_rewards += rewards
             avg_optimals += is_optimal
@@ -63,9 +38,11 @@ def ex_2_3(runs, k, steps, epsilons, stationary):
         avg_optimals /= runs
         # plot all configurations:
         # Average rewards over time
-        ax1.plot(avg_rewards, label=f"$\epsilon$={eps:.2f}")
+        ax1.plot(avg_rewards, label=f"$\epsilon$={eps:.2f} | $Q_1(a)={initial_value}$")
         # % of times optimal action was chosen
-        ax2.plot(avg_optimals, label=f"$\epsilon$={eps:.2f}")
+        ax2.plot(avg_optimals, label=f"$\epsilon$={eps:.2f} | $Q_1(a)={initial_value}$")
+
+    print()
 
     ax1.legend()
     ax2.legend()
@@ -77,10 +54,14 @@ def ex_2_3(runs, k, steps, epsilons, stationary):
 
 def get_args():
     parser = argparse.ArgumentParser()
+    # k-armed bandit configuration
     parser.add_argument('-k', type=int, default=10, help="Number of bandit arms")
     parser.add_argument('--stationary', action='store_true', help="Whether to simulate a stationary arm-bandit or not")
+    # action value smapling algorithm configurations
+    parser.add_argument('--initial_value', type=float, default=0, help="initial action values")
+    parser.add_argument('--alpha', type=float, default=1, help="discount factor")
     parser.add_argument('-s', '--steps', type=int, default=1000, help="Steps to run the action value average estimates")
-    parser.add_argument('-r', '--runs', type=int, default=2000, help="Runs to average over")
+    parser.add_argument('-r', '--runs', type=int, default=1000, help="Runs to average over")
     parser.add_argument(
         '-e', '--epsilons', type=float, nargs='+', default=1e-2, help="list of greedy probabilities to compare")
     return parser.parse_args()
@@ -93,5 +74,7 @@ if __name__ == "__main__":
         k=args.k,
         steps=args.steps,
         epsilons=args.epsilons,
-        stationary=args.stationary
+        initial_value=args.initial_value,
+        stationary=args.stationary,
+        alpha=args.alpha
     )
