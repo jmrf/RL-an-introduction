@@ -13,8 +13,6 @@ class GridWorld:
         self.states = range(size * size)    # states as a flat list [0..size^2]
         self.actions = actions
         self.dynamics = dynamics
-        # init state values
-        self.current_state = self.states[0]
 
     @staticmethod
     def state_2_coordinates(state: int, size: int) -> Tuple[int, int]:
@@ -34,22 +32,22 @@ class GridWorld:
         # select accordingly
         if (len(tie_states) > 1):
             # select randomly between the ties
+            logger.warning("Selectin state randomly")
             transition = np.random.choice(tie_states)
         else:
             return tie_states[0]
 
-    def get_next_state(self, action: int) -> int:
+    def get_next_state(self, state, action: int) -> int:
         """ Get next state given an action and the internal grid world current state """
         # state-transition probabilities when taking action 'a' in state 's'
-        next_state = self.get_max_or_break_tie(self.dynamics[self.current_state][action]['transition_probs'])
+        next_state = self.get_max_or_break_tie(self.dynamics[state][action]['transition_probs'])
         return next_state
 
-    def step(self, action: int) -> Tuple[int, float]:
+    def step(self, state, action: int) -> Tuple[int, float]:
         """ Perform one step move in the grid world """
         if (action < 0 or action > len(self.actions)):
             raise ValueError(f"Action '{action}' is an invalid action. Valid actions are: {self.actions}")
 
-        next_state = self.get_next_state(action)  # move to next state
-        reward = self.dynamics[self.current_state][action]['rewards'][next_state]  # obtain reward for the step
-        self.current_state = next_state  # update current state
+        next_state = self.get_next_state(state, action)  # move to next state
+        reward = self.dynamics[state][action]['rewards'][next_state]  # obtain reward for the step
         return next_state, reward
