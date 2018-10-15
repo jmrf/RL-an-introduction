@@ -5,7 +5,7 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 
 from common import logger
-from common.algos import action_value_sampling
+from common.algos.action_value import action_value_sampling
 from common.problems.k_armed_bandit import kArmedBandit
 
 
@@ -64,11 +64,17 @@ def get_args():
     parser.add_argument('-r', '--runs', type=int, default=1000, help="Runs to average over")
     parser.add_argument(
         '-e', '--epsilons', type=float, nargs='+', default=1e-2, help="list of greedy probabilities to compare")
+    # meta configurations
+    parser.add_argument('--rseed', type=int, default=123, help="random seed")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = get_args()
+
+    logger.info(f"Freezing random seed to {args.rseed}")
+    np.random.seed(args.rseed)
+
     ex_2_3(
         runs=args.runs,
         k=args.k,
