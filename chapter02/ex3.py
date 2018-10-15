@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from common import logger
 from common.algos.action_value import action_value_sampling
-from common.problems.k_armed_bandit import kArmedBandit
+from common.environments.k_armed_bandit import kArmedBandit
 
 
 def ex_2_3(runs, k, steps, epsilons, initial_value=0, stationary=True, alpha=1):

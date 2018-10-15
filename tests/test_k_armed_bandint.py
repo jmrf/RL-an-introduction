@@ -1,4 +1,4 @@
-from common.problems.k_armed_bandit import kArmedBandit
+from common.environments.k_armed_bandit import kArmedBandit
 
 import pytest
 import numpy as np
