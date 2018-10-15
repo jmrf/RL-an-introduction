@@ -1,18 +1,19 @@
 import numpy as np
 from typing import Dict, List, Tuple
 
+from common.environments import Environment
 
-class GridWorld:
+
+class GridWorld(Environment):
 
     def __init__(self, size: int, actions: List[Tuple[int, int]], dynamics: Dict):
         """ size: defines the grid dimensions as in size x world_size
             actions: list of actions as in possible movement. E.g.: (x, y) = [0, 1] -> move 1 position to the right
             dynamics: Dictionary specifying rewards and transition probabilities for each state - action pair
         """
+        super().__init__(actions, dynamics)
         self.size = size
         self.states = range(size * size)    # states as a flat list [0..size^2]
-        self.actions = actions
-        self.dynamics = dynamics
 
     @staticmethod
     def state_2_coordinates(state: int, size: int) -> Tuple[int, int]:
@@ -43,7 +44,7 @@ class GridWorld:
         next_state = self.get_max_or_break_tie(self.dynamics[state][action]['transition_probs'])
         return next_state
 
-    def step(self, state, action: int) -> Tuple[int, float]:
+    def step(self, state: int, action: int) -> Tuple[int, float]:
         """ Perform one step move in the grid world """
         if (action < 0 or action > len(self.actions)):
             raise ValueError(f"Action '{action}' is an invalid action. Valid actions are: {self.actions}")

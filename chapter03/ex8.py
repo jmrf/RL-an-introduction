@@ -14,10 +14,8 @@ from common.environments.grid_world import GridWorld
 """
 
 
-def init_world():
+def init_world(world_size=5):
     """ Grid world dynamics as per Example 3.8 """
-    world_size = 5
-    action_probs = [1, 1, 1, 1]     # deterministic environment
 
     # up, right, down, left
     actions = [
@@ -58,7 +56,7 @@ def init_world():
             # logger.debug(f"s:{s} + a:{a}({actions[a]}) --> s'={s_prime} | r={reward}")
 
             # always go where the action should take us
-            dynamics[s][a]['transition_probs'][s_prime] = 1
+            dynamics[s][a]['transition_probs'][s_prime] = 1  # deterministic environment
             dynamics[s][a]['rewards'][s_prime] = reward
 
         # logger.debug("-" * 10)
@@ -67,25 +65,19 @@ def init_world():
     return GridWorld(world_size, actions, dynamics)
 
 
-def compute_value_function(world, policy=None, gamma=0.9, epsilon=1e-3):
-
-    if policy is None:
-        # equiprobable distribution over actions
-        p = 1 / len(world.actions)
-        policy = dict([
-            (a_idx, p)
-            for a_idx, _ in enumerate(world.actions)    # actions are identified by its index
-        ])
-
+def compute_value_function(world, gamma=0.9, epsilon=1e-3):
+    iters = 0
+    p_action = 1 / len(world.actions)     # quiprobable random policy
     action_values = np.zeros(len(world.states))
     while True:
+        iters += 1
         new_values = np.zeros(action_values.shape)
         for s in world.states:
             for a_idx, _ in enumerate(world.actions):
                 next_state, reward = world.step(s, a_idx)
                 # logger.info(f"state={s} + action={a_idx} ==> state'={next_state} | reward={reward}")
                 # Bellman equation for value function
-                new_values[s] += policy[a_idx] * (reward + gamma * action_values[next_state])
+                new_values[s] += p_action * (reward + gamma * action_values[next_state])
 
         # termination criteria: check for converge
         diff = np.sum(np.abs(new_values - action_values))
@@ -97,7 +89,7 @@ def compute_value_function(world, policy=None, gamma=0.9, epsilon=1e-3):
         action_values = new_values
 
     np.set_printoptions(precision=3, suppress=True)
-    print(f"Computed Action values:\n{action_values.reshape(world.size, world.size)}")
+    print(f"Computed Action values (#iterations = {iters}):\n{action_values.reshape(world.size, world.size)}")
 
 
 if __name__ == "__main__":

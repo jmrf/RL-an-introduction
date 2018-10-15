@@ -1,8 +1,6 @@
 import random
-import numpy as np
-
 import typing
-
+import numpy as np
 from common import logger
 
 
@@ -36,6 +34,6 @@ class kArmedBandit:
     def get_optimal_action(self):
         return np.argmax(self.real_values)
 
-    def execute_action(self, a: int) -> float:
+    def step(self, a: int) -> float:
         # returns a reward value centered at q*(a) with variance 1
         return np.random.normal(self.get_real_action_value(a), self.var)

@@ -13,7 +13,7 @@ def test_k_arm_bandit_stationary(k):
     action_idx = 0
     r = bandit.get_real_action_value(action_idx)     # real value of the first action
     rewards = [
-        bandit.execute_action(action_idx)
+        bandit.step(action_idx)
         for _ in range(int(1e6))
     ]
     assert np.isclose(r, np.mean(rewards), rtol=5e-2)
@@ -24,6 +24,6 @@ def test_invalid_actions(k):
     bandit = kArmedBandit(k)
     # exception for invalid values
     with pytest.raises(ValueError):
-        bandit.execute_action(k+1)
+        bandit.step(k+1)
     with pytest.raises(ValueError):
-        bandit.execute_action(-1)
+        bandit.step(-1)
