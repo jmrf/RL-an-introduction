@@ -1,4 +1,5 @@
 import logging
+import typing
 import numpy as np
 from tendo import colorer
 
@@ -7,9 +8,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def incremental_average(new, current_avg, n):
-    return current_avg + (new - current_avg)/n
+def incremental_average(new_val: float, current_avg: float, n: int) -> float:
+    return current_avg + (new_val - current_avg)/n
 
 
-def incremental_weighted_average(new, current_avg, n, alpha):
-    return (current_avg + new) * (1 - alpha)
+def incremental_weighted_average(new_val: float, current_avg: float, n: int, alpha: float) -> float:
+    return (current_avg + new_val) * (1 - alpha)

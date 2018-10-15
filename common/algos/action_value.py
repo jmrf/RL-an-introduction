@@ -3,6 +3,7 @@ import typing
 from typing import Tuple, Any, Dict
 
 from common import logger
+from common.environments import Environment
 from common.environments.k_armed_bandit import kArmedBandit
 from common import incremental_average, incremental_weighted_average
 
@@ -42,14 +43,14 @@ def action_value_sampling(bandit, k, steps, epsilon, alpha, initial_value):
 
 
 def policy_evaluation(environment, policy, gamma=0.9, epsilon=1e-4):
-    # type: (Any, Dict, float, float) -> np.ndarray
+    # type: (Environment, Dict, float, float) -> np.ndarray
     iters = 0
     action_values = np.zeros(len(environment.states))
     while True:
         iters += 1
         new_values = np.zeros(action_values.shape)
         for s in environment.states:
-            for a_idx, _ in enumerate(environment.actions):
+            for a_idx, _ in enumerate(environment.get_valid_actions(s)):
                 next_state, reward = environment.step(s, a_idx)
                 # Bellman equation for value function
                 new_values[s] += policy[s][a_idx] * (reward + gamma * action_values[next_state])
@@ -66,12 +67,12 @@ def policy_evaluation(environment, policy, gamma=0.9, epsilon=1e-4):
     return action_values
 
 
-def policy_improvement(environment):
+def policy_improvement(environment: Environment) -> None:
     policy_stable = True
     for s in environment.states:
-        for a_idx, _ in enumerate(environment.actions):
+        for a_idx, _ in enumerate(environment.get_valid_actions(s)):
             raise NotImplemented(f"policy iteration is not NotImplemented yet")
 
 
-def policy_iteration():
+def policy_iteration() -> None:
     raise NotImplemented(f"policy iteration is not NotImplemented yet")
