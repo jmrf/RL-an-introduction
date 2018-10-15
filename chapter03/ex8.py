@@ -73,7 +73,7 @@ def compute_value_function(world, gamma=0.9, epsilon=1e-3):
         iters += 1
         new_values = np.zeros(action_values.shape)
         for s in world.states:
-            for a_idx, _ in enumerate(world.actions):
+            for a_idx, _ in enumerate(world.get_valid_actions(s)):
                 next_state, reward = world.step(s, a_idx)
                 # logger.info(f"state={s} + action={a_idx} ==> state'={next_state} | reward={reward}")
                 # Bellman equation for value function

@@ -1,19 +1,31 @@
 import numpy as np
 from typing import Dict, List, Tuple
 
+from common import logger
 from common.environments import Environment
 
 
 class GridWorld(Environment):
 
-    def __init__(self, size: int, actions: List[Tuple[int, int]], dynamics: Dict):
-        """ size: defines the grid dimensions as in size x world_size
-            actions: list of actions as in possible movement. E.g.: (x, y) = [0, 1] -> move 1 position to the right
-            dynamics: Dictionary specifying rewards and transition probabilities for each state - action pair
+    """
+        MDP for grid world.
+        Example 3.8 of the book
+    """
+
+    def __init__(self, size: int, actions: List[Tuple[int, int]], dynamics: Dict) -> None:
         """
-        super().__init__(actions, dynamics)
+        Parameters
+        ----------
+        size : int
+            defines the grid dimensions as in size x world_size
+        actions : List[Tuple[int, int]]
+            list of actions as in possible movement. E.g.: (x, y) = [0, 1] -> move 1 position to the right
+
+        """
+        states = range(size * size)
+        super().__init__(states, dynamics)  # states as a flat list [0..size^2]
+        self.actions = actions
         self.size = size
-        self.states = range(size * size)    # states as a flat list [0..size^2]
 
     @staticmethod
     def state_2_coordinates(state: int, size: int) -> Tuple[int, int]:
@@ -34,15 +46,14 @@ class GridWorld(Environment):
         if (len(tie_states) > 1):
             # select randomly between the ties
             logger.warning("Selectin state randomly")
-            transition = np.random.choice(tie_states)
+            return np.random.choice(tie_states)
         else:
             return tie_states[0]
 
     def get_next_state(self, state, action: int) -> int:
         """ Get next state given an action and the internal grid world current state """
         # state-transition probabilities when taking action 'a' in state 's'
-        next_state = self.get_max_or_break_tie(self.dynamics[state][action]['transition_probs'])
-        return next_state
+        return self.get_max_or_break_tie(self.dynamics[state][action]['transition_probs'])
 
     def step(self, state: int, action: int) -> Tuple[int, float]:
         """ Perform one step move in the grid world """
@@ -52,3 +63,6 @@ class GridWorld(Environment):
         next_state = self.get_next_state(state, action)  # move to next state
         reward = self.dynamics[state][action]['rewards'][next_state]  # obtain reward for the step
         return next_state, reward
+
+    def get_valid_actions(self, state):
+        return self.actions

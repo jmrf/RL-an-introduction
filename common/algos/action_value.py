@@ -70,7 +70,7 @@ def policy_improvement(environment):
     policy_stable = True
     for s in environment.states:
         for a_idx, _ in enumerate(environment.actions):
-            pass
+            raise NotImplemented(f"policy iteration is not NotImplemented yet")
 
 
 def policy_iteration():
