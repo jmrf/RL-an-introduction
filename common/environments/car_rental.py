@@ -14,7 +14,6 @@ class CarRental(Environment):
 
     def __init__(self, dynamics, **kwargs):
         # type: (Dict, int, int) -> None
-
         """
             Requires the following additional parameters apart from the Environment ones:
             max_cX: maximum cars at station X
@@ -53,13 +52,13 @@ class CarRental(Environment):
         """ Perform one step in the MDP """
         actions = self.get_valid_actions(state_idx)
         if (action_idx < 0 or action_idx > len(actions)):
-            raise ValueError(f"Invalid index action '{action}'")
+            raise ValueError(f"Invalid index action '{action_idx}'")
 
         # next state is the result of moving the cars between stations
         # and the requests / returns
         s1_returns = np.random.poisson(self.s1_req_lambda)
         s1_requests = np.random.poisson(self.s1_ret_lambda)
-        s2s1_requests = np.random.poisson(self.s2_req_lambda)
+        s2_requests = np.random.poisson(self.s2_req_lambda)
         s2_returns = np.random.poisson(self.s1_ret_lambda)
 
         # TODO: review restrictions as this migh yield invalid configurations!
@@ -72,3 +71,5 @@ class CarRental(Environment):
 
         # the reward is the earnings per car (10) - the cost of moving cars (2)
         reward = -2 * (to_s2 + to_s1) + 10 * (s1_requests + s2_requests)
+
+        return next_state, reward

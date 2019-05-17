@@ -1,3 +1,3 @@
 pycodestyle .
 pytest .
-mypy . --ignore-missing-imports
+# mypy . --ignore-missing-imports
